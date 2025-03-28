@@ -57,7 +57,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Serve static files (uploaded images)
 app.use(cors({
-  origin: '*', // Sabhi origins allow kar raha hai (For Debugging)
+  origin: '"http://localhost:3000"', // Sabhi origins allow kar raha hai (For Debugging)
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   credentials: true
 }));

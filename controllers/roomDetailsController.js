@@ -12,13 +12,6 @@ exports.saveRoomDetails = async (req, res) => {
   }
 
   try {
-    // Convert height and width to Number
-    // const formattedDroppedItems = payload.droppedItems.map(item => ({
-    //   name: item.name,
-    //   imageSrc: item.imageSrc,
-    //   height: Number(item.height),  // Convert to Number
-    //   width: Number(item.width)    // Convert to Number
-    // }));
 
     // Save room details to the database
     const roomDetails = new RoomDetails({
@@ -109,14 +102,14 @@ exports.getUserSaveRoomDetails = async (req, res) => {
     // Find all room details associated with the user ID
     const rooms = await RoomDetails.find({ user_id: userId }).populate("user_id", "name email");
 
- 
+
 
     if (rooms.length === 0) {
       return res.status(200).json({ message: "No rooms found", data: [] }); // ✅ Proper empty array return karo
     }
 
     res.status(200).json({
-      data:rooms,
+      data: rooms,
     });
   } catch (error) {
     console.error(error);
