@@ -14,6 +14,9 @@ router.get("/get-room-details/:id", roomDetailsController.getRoomDetailsById);
 // Delete Room Details by ID
 router.delete("/delete-room-details/:id", roomDetailsController.deleteRoomDetails);
 
+// Delete Room Details by ID
+router.put("/update-room-details/:id", roomDetailsController.editRoomDetails);
+
 router.post("/get-save-user-roomdetails", roomDetailsController.getUserSaveRoomDetails);
 
 module.exports = router;

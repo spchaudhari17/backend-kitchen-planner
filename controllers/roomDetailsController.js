@@ -53,6 +53,7 @@ exports.getRoomDetails = async (req, res) => {
   }
 };
 
+
 // Fetch Room Details by ID
 exports.getRoomDetailsById = async (req, res) => {
   const { id } = req.params;
@@ -87,6 +88,41 @@ exports.deleteRoomDetails = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+// update Room Details by ID
+exports.editRoomDetails = async (req, res) => {
+  const { id } = req.params;
+  console.log("roomId", id)
+
+  const updates = req.body;
+
+  try {
+    // Check if the room exists
+    const roomDetails = await RoomDetails.findById(id);
+    if (!roomDetails) {
+      return res.status(404).json({ error: "Room not found." });
+    }
+
+    // Update room details
+    roomDetails.width = updates.width;
+    roomDetails.depth = updates.depth;
+    roomDetails.description = updates.description;
+    roomDetails.subdescription = updates.subdescription;
+    roomDetails.notes = updates.notes || roomDetails.notes;
+    roomDetails.droppedItems = updates.droppedItems || roomDetails.droppedItems;
+
+    const updatedDetails = await roomDetails.save();
+
+    res.status(200).json({
+      message: "Room details updated successfully.",
+      data: updatedDetails,
+    });
+  } catch (error) {
+    console.error("Error updating room details:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 
 
 
