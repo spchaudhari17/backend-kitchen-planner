@@ -3,7 +3,7 @@ const Product = require('../models/productModel');
 // Add a new product
 const addProduct = async (req, res) => {
     try {
-        const { cabinateName, cabinateType} = req.body;
+        const { cabinateName, cabinateType, price} = req.body;
         const cabinateImage = req.file ? req.file.path : null;
 
         console.log("cabinateImage", cabinateName)
@@ -11,7 +11,8 @@ const addProduct = async (req, res) => {
         const newProduct = new Product({
             cabinateName,
             cabinateType,
-            cabinateImage
+            cabinateImage,
+            price
         });
 
         await newProduct.save();

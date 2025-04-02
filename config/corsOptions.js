@@ -27,6 +27,9 @@ const oauthCorsOptions = {
 };
 
 const corsMiddleware = (req, res, next) => {
+
+    
+
     if (publicPaths.includes(req.path)) {
         // Allow public paths without CORS restrictions
         cors(oauthCorsOptions)(req, res, next);
