@@ -57,18 +57,10 @@ app.use(session({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static files (uploaded images)
-// app.use(cors({
-//   origin: '"http://localhost:3002"', // Sabhi origins allow kar raha hai (For Debugging)
-//   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-//   credentials: true
-// }));
 
+//cors policy
 app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*'); // Ya frontend ka specific origin
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // ⭐ This is important
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); //  This is important
   next();
 });
 
