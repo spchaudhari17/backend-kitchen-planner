@@ -21,6 +21,8 @@ const url = require('./config/url');
 const {routerColors} = require('./routes/colorRoutes');
 const roomDetails = require('./routes/roomDetailsRoute')
 const productAdd = require('./routes/productsAdd')
+const ShippingAddress = require('./routes/shippingRoutes')
+const paymentRoutes = require("./routes/paymentRoutes");
 // Import middleware
 const requireAuth = require('./middleware/requireAuth');
 
@@ -62,13 +64,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //   credentials: true
 // }));
 
-// app.use((req, res, next) => {
+app.use((req, res, next) => {
 //   res.setHeader('Access-Control-Allow-Origin', '*'); // Ya frontend ka specific origin
 //   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
 //   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // ⭐ This is important
-//   next();
-// });
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // ⭐ This is important
+  next();
+});
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -80,6 +82,8 @@ app.use('/api/auth', require('./routes/auth')); // Authentication routes
 app.use('/api/colors',routerColors)
 app.use("/api/room-details", roomDetails);
 app.use("/api/product", productAdd);
+app.use("/api", ShippingAddress);
+app.use("/api/payment", paymentRoutes);
 // Middleware for authenticated routes
 app.use(requireAuth);
 
