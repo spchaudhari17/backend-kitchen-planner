@@ -12,7 +12,7 @@ const addProduct = async (req, res) => {
             cabinateName,
             cabinateType,
             cabinateImage,
-            price
+            // price
         });
 
         await newProduct.save();
