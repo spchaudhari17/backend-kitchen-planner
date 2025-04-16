@@ -32,11 +32,14 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
     storage,
     fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }, 
+    limits: { fileSize: 5 * 1024 * 1024 },
 });
 
 // Routes for managing products
-router.post("/products", upload.single("cabinateImage"), productController.addProduct); // Add product
+router.post("/products", upload.fields([
+    { name: 'cabinateImage', maxCount: 1 },
+    { name: 'cabinateFrontImage', maxCount: 1 }
+]), productController.addProduct); // Add product
 router.get("/products", productController.getProducts); // Get all products
 router.put("/products/:id", upload.single("cabinateImage"), productController.updateProduct); // Update product
 router.delete("/products/:id", productController.deleteProduct); // Delete product

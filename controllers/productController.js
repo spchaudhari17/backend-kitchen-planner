@@ -3,16 +3,35 @@ const Product = require('../models/productModel');
 // Add a new product
 const addProduct = async (req, res) => {
     try {
-        const { cabinateName, cabinateType, price} = req.body;
-        const cabinateImage = req.file ? req.file.path : null;
-
-        console.log("cabinateImage", cabinateName)
+        const { 
+            cabinateName, 
+            cabinateType,
+            minWidth,
+            maxWidth,
+            minDepth,
+            maxDepth,
+            hinges,
+            handles,
+            drawers
+        } = req.body;
+        
+        // Check if both images are uploaded
+        if (!req.files || !req.files['cabinateImage'] || !req.files['cabinateFrontImage']) {
+            return res.status(400).json({ message: 'Both top view and front view images are required' });
+        }
 
         const newProduct = new Product({
             cabinateName,
             cabinateType,
-            cabinateImage,
-            // price
+            cabinateImage: req.files['cabinateImage'][0].path,
+            cabinateFrontImage: req.files['cabinateFrontImage'][0].path,
+            minWidth,
+            maxWidth,
+            minDepth,
+            maxDepth,
+            hinges,
+            handles,
+            drawers
         });
 
         await newProduct.save();
@@ -27,16 +46,27 @@ const addProduct = async (req, res) => {
 const getProducts = async (req, res) => {
     try {
         const products = await Product.find();
+        
+        const updatedProducts = products.map(product => {
+            const productObj = product.toObject(); // Convert Mongoose document to plain object
+            
+            return {
+                ...productObj,
+                cabinateImage: productObj.cabinateImage 
+                    ? `http://localhost:3001/${productObj.cabinateImage.replace(/\\/g, "/")}`
+                    : null,
+                cabinateFrontImage: productObj.cabinateFrontImage 
+                    ? `http://localhost:3001/${productObj.cabinateFrontImage.replace(/\\/g, "/")}`
+                    : null
+            };
+        });
 
-        const updatedProducts = products.map(product => ({
-            ...product._doc,
-            cabinateImage: product.cabinateImage 
-                ? `http://localhost:3001/${product.cabinateImage.replace(/\\/g, "/")}`
-                : null
-        }));
         res.status(200).json(updatedProducts);
     } catch (err) {
-        res.status(500).json({ message: 'Error retrieving products', error: err.message });
+        res.status(500).json({ 
+            message: 'Error retrieving products', 
+            error: err.message 
+        });
     }
 };
     
