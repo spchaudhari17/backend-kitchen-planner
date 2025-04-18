@@ -69,36 +69,55 @@ exports.updateTransactionStatus = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+ 
 
-exports.recordBankTransfer = async (req, res) => {
-  const { userId, amount, accountNumber, ifscCode } = req.body;
-
-  if (!userId || !amount || !accountNumber || !ifscCode) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
+exports.createBankTransferIntent = async (req, res) => {
+  const { userId, amount, email, name } = req.body;
 
   try {
+    const customer = await stripe.customers.create({ email, name });
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Convert to cents
+      currency: 'aud',
+      customer: customer.id,
+      payment_method_types: ['au_becs_debit'],
+    });
+
     const newTransaction = new Transaction({
       user_id: userId,
       amount,
-      payment_method: "bank_transfer",
+      payment_method: "bank_transfer", // ✅ Must match schema enum
       transaction_type: "product-purchase",
-      transaction_status: "pending", // pending until admin manually approves
-      bank_details: {
-        accountNumber,
-        ifscCode
-      }
+      transaction_status: "pending",
+      transaction_id: paymentIntent.id, // Store Stripe intent ID
     });
 
-    const savedTransaction = await newTransaction.save();
+    await newTransaction.save();
 
-    return res.status(201).json({
+    // ✅ Send success only after saving transaction
+    res.status(200).json({
       success: true,
-      message: "Bank transfer recorded. Awaiting verification.",
-      transaction_id: savedTransaction._id
+      clientSecret: paymentIntent.client_secret,
     });
+
   } catch (error) {
-    console.error("Error recording bank transfer:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Stripe BECS Error:", error);
+    res.status(500).json({ error: "Failed to create bank transfer intent" });
   }
 };
+
+// controllers/paymentController.js
+exports.getPendingTransactions = async (req, res) => {
+  try {
+    const pendingTransactions = await Transaction.find({
+      transaction_status: "pending",
+    }).select("user_id transaction_id amount payment_method created_at"); // ✅ use created_at (not createdAt)
+
+    return res.status(200).json({ success: true, data: pendingTransactions });
+  } catch (error) {
+    console.error("Error fetching pending transactions:", error);
+    res.status(500).json({ error: "Failed to fetch pending transactions" });
+  }
+};
+
