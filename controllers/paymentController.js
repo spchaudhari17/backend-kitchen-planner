@@ -2,10 +2,12 @@
 const Stripe = require("stripe");
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const Transaction = require("../models/transactionModel");
+const nodemailer = require("nodemailer");
+const { generateUserOrderEmail, generateAdminOrderEmail } = require("../controllers/templates/emailTemplates");
 
 exports.createPaymentIntent = async (req, res) => {
   try {
-    const { userId, amount, products } = req.body;
+    const { userId, amount, products, email } = req.body;
 
     if (!userId || !amount || !products || products.length === 0) {
       return res.status(400).json({ error: "userId, amount and products are required" });
@@ -23,6 +25,7 @@ exports.createPaymentIntent = async (req, res) => {
       // 👉 Save products in your Transaction model
       const newTransaction = new Transaction({
         user_id: userId,
+        User_email: email, // ✅ Required field added here
         amount: originalAmount,
         payment_method: "card",
         transaction_type: "product-purchase",
@@ -30,6 +33,7 @@ exports.createPaymentIntent = async (req, res) => {
         transaction_status: "pending",
         products: products, 
       });
+      
 
       const savedTransaction = await newTransaction.save();
 
@@ -47,18 +51,19 @@ exports.createPaymentIntent = async (req, res) => {
 
 
  
+
 exports.updateTransactionStatus = async (req, res) => {
   try {
-    const { transaction_id, userId, products } = req.body; 
+    const { transaction_id, userId, products } = req.body;
 
     const updated = await Transaction.findOneAndUpdate(
       {
-        transaction_id: transaction_id,
+        transaction_id,
         user_id: userId,
       },
       {
         transaction_status: "success",
-        products: products,   
+        products,
       },
       { new: true }
     );
@@ -67,13 +72,54 @@ exports.updateTransactionStatus = async (req, res) => {
       return res.status(404).json({ error: "Transaction not found" });
     }
 
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.ADMIN_EMAIL,
+        pass: process.env.ADMIN_PASS,
+      },
+    });
+
+    // Generate HTML content using templates
+    const userHtml = generateUserOrderEmail(
+      updated.User_email,
+      updated.amount,
+      transaction_id,
+      updated.payment_method,
+      updated.products
+    );
+
+    const adminHtml = generateAdminOrderEmail(
+      updated.User_email,
+      updated.amount,
+      transaction_id,
+      updated.payment_method,
+      updated.products
+    );
+
+    // Send to user
+    await transporter.sendMail({
+      from: `"Kitchen Planner" <${process.env.ADMIN_EMAIL}>`,
+      to: updated.User_email,
+      subject: `🧾 Your Kitchen Planner Order Confirmation`,
+      html: userHtml,
+    });
+
+    // Send to admin
+    await transporter.sendMail({
+      from: `"Kitchen Planner" <${process.env.ADMIN_EMAIL}>`,
+      to: process.env.ADMIN_EMAIL,
+      subject: `📦 New Order Received: ${transaction_id}`,
+      html: adminHtml,
+    });
+
     return res.status(200).json({ success: true, data: updated });
+
   } catch (err) {
     console.error("Update Transaction Error:", err);
     res.status(500).json({ error: err.message });
   }
 };
-
 exports.createBankTransferIntent = async (req, res) => {
   const { userId, amount, email, name } = req.body;
 
