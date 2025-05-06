@@ -26,8 +26,14 @@ const paymentRoutes = require("./routes/paymentRoutes");
 // Import middleware
 const requireAuth = require('./middleware/requireAuth');
 
+const cartRoutes = require("./routes/cartRoutes");
+
+
+
 const port = process.env.PORT || 4000;
 const app = express();
+
+
 const server = http.createServer(app);
 const io = socketIo(server, { cors: { origin: url, methods: ['GET', 'POST'] } });
 
@@ -92,6 +98,8 @@ app.use("/api/room-details", roomDetails);
 app.use("/api/product", productAdd);
 app.use("/api", ShippingAddress);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/cart", cartRoutes);
+
 // Middleware for authenticated routes
 app.use(requireAuth);
 
