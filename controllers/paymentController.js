@@ -4,6 +4,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const Transaction = require("../models/transactionModel");
 const nodemailer = require("nodemailer");
 const { generateUserOrderEmail, generateAdminOrderEmail } = require("../controllers/templates/emailTemplates");
+const User = require("../models/user/User");
 
 exports.createPaymentIntent = async (req, res) => {
   try {
@@ -51,7 +52,77 @@ exports.createPaymentIntent = async (req, res) => {
 
 
  
+///for only one main admin
+// exports.updateTransactionStatus = async (req, res) => {
+//   try {
+//     const { transaction_id, userId, products } = req.body;
 
+//     const updated = await Transaction.findOneAndUpdate(
+//       {
+//         transaction_id,
+//         user_id: userId,
+//       },
+//       {
+//         transaction_status: "success",
+//         products,
+//       },
+//       { new: true }
+//     );
+
+//     if (!updated) {
+//       return res.status(404).json({ error: "Transaction not found" });
+//     }
+
+//     const transporter = nodemailer.createTransport({
+//       service: "gmail",
+//       auth: {
+//         user: process.env.ADMIN_EMAIL,
+//         pass: process.env.ADMIN_PASS,
+//       },
+//     });
+
+//     // Generate HTML content using templates
+//     const userHtml = generateUserOrderEmail(
+//       updated.User_email,
+//       updated.amount,
+//       transaction_id,
+//       updated.payment_method,
+//       updated.products
+//     );
+
+//     const adminHtml = generateAdminOrderEmail(
+//       updated.User_email,
+//       updated.amount,
+//       transaction_id,
+//       updated.payment_method,
+//       updated.products
+//     );
+
+//     // Send to user
+//     await transporter.sendMail({
+//       from: `"Kitchen Planner" <${process.env.ADMIN_EMAIL}>`,
+//       to: updated.User_email,
+//       subject: `🧾 Your Kitchen Planner Order Confirmation`,
+//       html: userHtml,
+//     });
+
+//     // Send to admin
+//     await transporter.sendMail({
+//       from: `"Kitchen Planner" <${process.env.ADMIN_EMAIL}>`,
+//       to: process.env.ADMIN_EMAIL,
+//       subject: `📦 New Order Received: ${transaction_id}`,
+//       html: adminHtml,
+//     });
+
+//     return res.status(200).json({ success: true, data: updated });
+
+//   } catch (err) {
+//     console.error("Update Transaction Error:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// };
+
+//for all admins
 exports.updateTransactionStatus = async (req, res) => {
   try {
     const { transaction_id, userId, products } = req.body;
@@ -80,9 +151,18 @@ exports.updateTransactionStatus = async (req, res) => {
       },
     });
 
-    // Generate HTML content using templates
+     const buyer = await User.findById(userId);
+    if (!buyer) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+ 
+    const admins = await User.find({ role: "admin" });
+    const adminEmails = admins.map((admin) => admin.email);
+
+   
     const userHtml = generateUserOrderEmail(
-      updated.User_email,
+      buyer.email,
       updated.amount,
       transaction_id,
       updated.payment_method,
@@ -90,28 +170,30 @@ exports.updateTransactionStatus = async (req, res) => {
     );
 
     const adminHtml = generateAdminOrderEmail(
-      updated.User_email,
+      buyer.email,
       updated.amount,
       transaction_id,
       updated.payment_method,
       updated.products
     );
 
-    // Send to user
+ 
     await transporter.sendMail({
       from: `"Kitchen Planner" <${process.env.ADMIN_EMAIL}>`,
-      to: updated.User_email,
+      to: buyer.email,
       subject: `🧾 Your Kitchen Planner Order Confirmation`,
       html: userHtml,
     });
 
-    // Send to admin
-    await transporter.sendMail({
-      from: `"Kitchen Planner" <${process.env.ADMIN_EMAIL}>`,
-      to: process.env.ADMIN_EMAIL,
-      subject: `📦 New Order Received: ${transaction_id}`,
-      html: adminHtml,
-    });
+ 
+    if (adminEmails.length > 0) {
+      await transporter.sendMail({
+        from: `"Kitchen Planner" <${process.env.ADMIN_EMAIL}>`,
+        to: adminEmails,
+        subject: `📦 New Order Received: ${transaction_id}`,
+        html: adminHtml,
+      });
+    }
 
     return res.status(200).json({ success: true, data: updated });
 
