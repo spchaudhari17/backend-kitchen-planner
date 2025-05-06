@@ -59,10 +59,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 //cors policy
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); //  This is important
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); //  This is important
+//   next();
+// });
+
+
+const allowedOrigins = ['http://31.220.49.117', 'http://localhost:3000'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true, // if you are using cookies or sessions
+}));
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
