@@ -26,14 +26,8 @@ const paymentRoutes = require("./routes/paymentRoutes");
 // Import middleware
 const requireAuth = require('./middleware/requireAuth');
 
-const cartRoutes = require("./routes/cartRoutes");
-
-
-
 const port = process.env.PORT || 4000;
 const app = express();
-
-
 const server = http.createServer(app);
 const io = socketIo(server, { cors: { origin: url, methods: ['GET', 'POST'] } });
 
@@ -65,26 +59,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 //cors policy
-// app.use((req, res, next) => {
-//   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); //  This is important
-//   next();
-// });
-
-
-const allowedOrigins = ['http://31.220.49.117', 'http://localhost:3000'];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true, // if you are using cookies or sessions
-}));
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); //  This is important
+  next();
+});
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -98,8 +76,6 @@ app.use("/api/room-details", roomDetails);
 app.use("/api/product", productAdd);
 app.use("/api", ShippingAddress);
 app.use("/api/payment", paymentRoutes);
-app.use("/api/cart", cartRoutes);
-
 // Middleware for authenticated routes
 app.use(requireAuth);
 

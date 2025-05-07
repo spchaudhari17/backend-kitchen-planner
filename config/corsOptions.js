@@ -28,7 +28,9 @@ const oauthCorsOptions = {
 
 const corsMiddleware = (req, res, next) => {
 
-    
+    console.log('Incoming Origin:', req.headers.origin);
+    console.log('Request Path:', req.path);
+    console.log('Allowed Origins:', allowedOrigins);
 
     if (publicPaths.includes(req.path)) {
         // Allow public paths without CORS restrictions
