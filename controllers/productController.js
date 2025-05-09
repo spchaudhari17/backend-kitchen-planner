@@ -53,10 +53,10 @@ const getProducts = async (req, res) => {
             return {
                 ...productObj,
                 cabinateImage: productObj.cabinateImage 
-                    ? `http://localhost:3001/${productObj.cabinateImage.replace(/\\/g, "/")}`
+                    ? `${process.env.SERVER_URL}/${productObj.cabinateImage.replace(/\\/g, "/")}`
                     : null,
                 cabinateFrontImage: productObj.cabinateFrontImage 
-                    ? `http://localhost:3001/${productObj.cabinateFrontImage.replace(/\\/g, "/")}`
+                    ? `${process.env.SERVER_URL}/${productObj.cabinateFrontImage.replace(/\\/g, "/")}`
                     : null
             };
         });
