@@ -22,3 +22,36 @@ exports.getUserCart = async (req, res) => {
       res.status(500).json({ success: false, error: error.message });
     }
   };
+
+
+// controllers/cartController.js
+exports.deleteCartItem = async (req, res) => {
+  const { userId, itemId } = req.params;
+
+  try {
+    const result = await Cart.updateMany(
+      {
+        user_id: userId,
+        "droppedItems.id": itemId  
+      },
+      {
+        $pull: {
+          droppedItems: { id: itemId }
+        }
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ success: false, error: 'Item not found or not removed' });
+    }
+
+    res.status(200).json({ success: true, message: 'Item removed successfully' });
+  } catch (error) {
+    console.error("Delete Cart Item Error:", error);
+    res.status(500).json({ success: false, error: 'Failed to delete item' });
+  }
+};
+
+  
+  
+  
