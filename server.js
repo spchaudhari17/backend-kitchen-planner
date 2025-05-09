@@ -23,6 +23,7 @@ const roomDetails = require('./routes/roomDetailsRoute')
 const productAdd = require('./routes/productsAdd')
 const ShippingAddress = require('./routes/shippingRoutes')
 const paymentRoutes = require("./routes/paymentRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 // Import middleware
 const requireAuth = require('./middleware/requireAuth');
 
@@ -76,8 +77,8 @@ app.use("/api/room-details", roomDetails);
 app.use("/api/product", productAdd);
 app.use("/api", ShippingAddress);
 app.use("/api/payment", paymentRoutes);
-// Middleware for authenticated routes
-app.use(requireAuth);
+app.use("/api/cart", cartRoutes);
+
 
 // Setup real-time socket connections
 setupSocket(io);
@@ -94,3 +95,4 @@ mongoose.connection.once('open', () => {
   console.log('Database Connected Successfully!');
   server.listen(port, () => console.log(`Server running on port ${port}`));
 });
+ 
