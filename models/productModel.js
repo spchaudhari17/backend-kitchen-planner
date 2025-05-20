@@ -12,7 +12,8 @@ const cabinateSchema = new mongoose.Schema({
     maxDepth: { type: Number },
     hinges: { type: Number },
     handles: { type: Number },
-    drawers: { type: Number }
+    drawers: { type: Number },
+    description: {type: String}
 });
 
 const Product = mongoose.model('Cabinates', cabinateSchema);

@@ -12,7 +12,8 @@ const addProduct = async (req, res) => {
             maxDepth,
             hinges,
             handles,
-            drawers
+            drawers,
+            description
         } = req.body;
         
         // Check if both images are uploaded
@@ -31,7 +32,8 @@ const addProduct = async (req, res) => {
             maxDepth,
             hinges,
             handles,
-            drawers
+            drawers,
+            description
         });
 
         await newProduct.save();
