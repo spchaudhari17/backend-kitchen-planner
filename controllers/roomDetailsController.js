@@ -7,7 +7,7 @@ exports.saveRoomDetails = async (req, res) => {
   const payload = req.body;
   console.log("Received payload:", payload.user_id);
 
-  if (!payload.width || !payload.depth || !payload.description || !payload.subdescription) {
+  if (!payload.width || !payload.depth || !payload.description  ) {
     return res.status(400).json({ error: "All fields are required." });
   }
 
