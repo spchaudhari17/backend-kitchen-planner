@@ -27,7 +27,7 @@ const RoomDetailsSchema = new mongoose.Schema(
     },
     subdescription: {
       type: String,
-      required: true,
+      
     },
     notes: { type: Object, default: {} },
     droppedItems: { type: [DroppedItemSchema], required: true, default: [] } // Store dropped items
