@@ -71,28 +71,74 @@ const getProducts = async (req, res) => {
         });
     }
 };
+
+
+const getProductById = async (req, res) => {
+    try {
+        const productId = req.params.id;
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.status(200).json({ product });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Error fetching product", error: err.message });
+    }
+};
+
     
 // Update a product
 const updateProduct = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { cabinateName, cabinateType } = req.body;
-        const cabinateImage = req.file ? req.file.path : null;
+        const productId = req.params.id;
 
-        const updatedProduct = await Product.findByIdAndUpdate(
-            id,
-            { cabinateName, cabinateType, cabinateImage },
-            { new: true }
-        );
-
-        if (!updatedProduct) {
-            return res.status(404).json({ message: 'Product not found' });
+        // Fetch existing product
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
         }
 
-        res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
+        // Update fields from body
+        const {
+            cabinateName,
+            cabinateType,
+            minWidth,
+            maxWidth,
+            minDepth,
+            maxDepth,
+            hinges,
+            handles,
+            drawers,
+            description
+        } = req.body;
+
+        if (cabinateName) product.cabinateName = cabinateName;
+        if (cabinateType) product.cabinateType = cabinateType;
+        if (minWidth) product.minWidth = minWidth;
+        if (maxWidth) product.maxWidth = maxWidth;
+        if (minDepth) product.minDepth = minDepth;
+        if (maxDepth) product.maxDepth = maxDepth;
+        if (hinges) product.hinges = hinges;
+        if (handles) product.handles = handles;
+        if (drawers) product.drawers = drawers;
+        if (description) product.description = description;
+
+        // Optional: Update images if uploaded
+        if (req.files['cabinateImage']) {
+            product.cabinateImage = req.files['cabinateImage'][0].path;
+        }
+        if (req.files['cabinateFrontImage']) {
+            product.cabinateFrontImage = req.files['cabinateFrontImage'][0].path;
+        }
+
+        await product.save();
+        res.status(200).json({ message: "Product updated successfully", product });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Error updating product', error: err.message });
+        res.status(500).json({ message: "Error updating product", error: err.message });
     }
 };
 
@@ -114,4 +160,4 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-module.exports = { addProduct, getProducts, updateProduct, deleteProduct };
+module.exports = { addProduct, getProducts, updateProduct, deleteProduct, getProductById };

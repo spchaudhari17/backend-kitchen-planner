@@ -1,4 +1,4 @@
- 
+
 const mongoose = require("mongoose");
 
 const transactionSchema = new mongoose.Schema({
@@ -14,18 +14,18 @@ const transactionSchema = new mongoose.Schema({
     ifscCode: { type: String }
   },
   shipping_address: { type: mongoose.Schema.Types.ObjectId, ref: "ShippingAddress" },
-products: [
-  {
-    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-    name: String,
-    priceAtPurchase: Number,
-    quantity: Number,
-    image: String,
-    cabinateType: String,
-    width:Number,
-    depth:Number,
-  }
-],
+  products: [
+    {
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+      name: String,
+      priceAtPurchase: Number,
+      quantity: Number,
+      image: String,
+      cabinateType: String,
+      width: Number,
+      depth: Number,
+    }
+  ],
 
   created_at: { type: Date, default: Date.now }
 });

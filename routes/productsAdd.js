@@ -40,8 +40,17 @@ router.post("/products", upload.fields([
     { name: 'cabinateImage', maxCount: 1 },
     { name: 'cabinateFrontImage', maxCount: 1 }
 ]), productController.addProduct); // Add product
+
 router.get("/products", productController.getProducts); // Get all products
-router.put("/products/:id", upload.single("cabinateImage"), productController.updateProduct); // Update product
+
+router.get("/products/:id", productController.getProductById);
+
+
+router.put("/products/:id", upload.fields([
+    { name: 'cabinateImage', maxCount: 1 },
+    { name: 'cabinateFrontImage', maxCount: 1 }
+]), productController.updateProduct);
+
 router.delete("/products/:id", productController.deleteProduct); // Delete product
 
 module.exports = router;
