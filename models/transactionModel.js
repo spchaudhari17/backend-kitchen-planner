@@ -8,7 +8,7 @@ const transactionSchema = new mongoose.Schema({
   payment_method: { type: String, enum: ["card", "bank_transfer"], required: true },
   transaction_type: { type: String, default: "top-up" },
   transaction_id: { type: String },
-  transaction_status: { type: String, enum: ["pending", "success", "failed"], default: "pending" },
+  transaction_status: { type: String, enum: ["pending", "success", "failed","delivered", "Out of Delivery", "Progress"], default: "pending" },
   bank_details: {
     accountNumber: { type: String },
     ifscCode: { type: String }

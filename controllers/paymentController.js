@@ -51,7 +51,7 @@ exports.createPaymentIntent = async (req, res) => {
 
 exports.updateTransactionStatus = async (req, res) => {
   try {
-    const { transaction_id, userId, products } = req.body;
+    const { transaction_id, userId, status, products } = req.body;
 
     const updated = await Transaction.findOneAndUpdate(
       {
@@ -59,8 +59,8 @@ exports.updateTransactionStatus = async (req, res) => {
         user_id: userId,
       },
       {
-        transaction_status: "success",
-        products,
+        transaction_status: status || "success",
+        ...(products && { products }),
       },
       { new: true }
     );
@@ -124,6 +124,7 @@ exports.updateTransactionStatus = async (req, res) => {
   }
 };
 
+ 
 exports.createBankTransferIntent = async (req, res) => {
   const { userId, amount, email, name } = req.body;
 
@@ -185,9 +186,10 @@ exports.getOrderProducts = async (req, res) => {
       return res.status(404).json({ success: false, message: "Transaction not found" });
     }
 
-    if (transaction.transaction_status !== "success") {
-      return res.status(400).json({ success: false, message: "Payment not completed. Cannot show products." });
-    }
+  if (transaction.transaction_status === "Pending") {
+  return res.status(400).json({ success: false, message: "Payment not completed. Cannot show products." });
+}
+
 
     const enrichedProducts = await Promise.all(
       (transaction.products || []).map(async (item, index) => {
@@ -219,6 +221,7 @@ exports.getOrderProducts = async (req, res) => {
       data: enrichedProducts,
       user: transaction.user_id,
       shipping: transaction.shipping_address || null,
+        created_at: transaction.created_at,
     });
 
   } catch (error) {
