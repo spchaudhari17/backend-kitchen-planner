@@ -15,6 +15,7 @@ const cabinateSchema = new mongoose.Schema({
     drawers: { type: Number },
     description: {type: String},
     overlap: { type: Number },
+    basePrice: {type: String},
 });
 
 const Product = mongoose.model('Cabinates', cabinateSchema);

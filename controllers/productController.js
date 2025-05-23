@@ -14,7 +14,8 @@ const addProduct = async (req, res) => {
             handles,
             drawers,
             description,
-            overlap
+            overlap,
+            basePrice
         } = req.body;
         
         // Check if both images are uploaded
@@ -35,7 +36,8 @@ const addProduct = async (req, res) => {
             handles,
             drawers,
             description,
-            overlap
+            overlap,
+            basePrice
         });
 
         await newProduct.save();
@@ -115,7 +117,8 @@ const updateProduct = async (req, res) => {
             handles,
             drawers,
             description,
-            overlap
+            overlap,
+            basePrice
         } = req.body;
 
         if (cabinateName) product.cabinateName = cabinateName;
@@ -129,6 +132,7 @@ const updateProduct = async (req, res) => {
         if (drawers) product.drawers = drawers;
         if (description) product.description = description;
         if (overlap) product.overlap = overlap;
+        if (basePrice) product.basePrice = basePrice;
 
         // Optional: Update images if uploaded
         if (req.files['cabinateImage']) {
