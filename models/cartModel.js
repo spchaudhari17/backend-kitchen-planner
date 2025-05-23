@@ -22,6 +22,7 @@ const cartSchema = new mongoose.Schema({
       rotation: Number,
       width: Number,
       height: Number,
+      basePrice: {type: String},
     },
   ],
   createdAt: {
