@@ -23,6 +23,8 @@ const cartSchema = new mongoose.Schema({
       width: Number,
       height: Number,
       basePrice: {type: String},
+      minWidth: {type: String},
+      maxWidth: {type: String},
     },
   ],
   createdAt: {
