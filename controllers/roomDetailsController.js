@@ -21,7 +21,8 @@ exports.saveRoomDetails = async (req, res) => {
       subdescription: payload.subdescription,
       notes: payload.notes || {},
       droppedItems: payload.droppedItems,
-      user_id: payload.user_id
+      user_id: payload.user_id,
+      snapshotImage: payload.snapshotImage || "", 
     });
 
     const savedDetails = await roomDetails.save();
@@ -110,6 +111,7 @@ exports.editRoomDetails = async (req, res) => {
     roomDetails.subdescription = updates.subdescription;
     roomDetails.notes = updates.notes || roomDetails.notes;
     roomDetails.droppedItems = updates.droppedItems || roomDetails.droppedItems;
+roomDetails.snapshotImage = updates.snapshotImage || roomDetails.snapshotImage;
 
     const updatedDetails = await roomDetails.save();
 
@@ -141,7 +143,7 @@ exports.getUserSaveRoomDetails = async (req, res) => {
 
 
     if (rooms.length === 0) {
-      return res.status(200).json({ message: "No rooms found", data: [] }); // ✅ Proper empty array return karo
+      return res.status(200).json({ message: "No rooms found", data: [] });  
     }
 
     res.status(200).json({
