@@ -27,7 +27,7 @@ const cartSchema = new mongoose.Schema({
       hinges: { type: Number },
       handles: { type: Number },
       drawers: { type: Number },
-      cabinateType: { type: String, required: true },
+      cabinateType: { type: String },
     },
   ],
   createdAt: {

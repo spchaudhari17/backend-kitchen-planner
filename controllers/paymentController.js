@@ -126,7 +126,7 @@ exports.updateTransactionStatus = async (req, res) => {
 
  
 exports.createBankTransferIntent = async (req, res) => {
-  const { userId, amount, email, name } = req.body;
+  const { userId, amount, email, name, products } = req.body;
 
   try {
     const customer = await stripe.customers.create({ email, name });
@@ -146,6 +146,7 @@ exports.createBankTransferIntent = async (req, res) => {
       transaction_type: "product-purchase",
       transaction_status: "pending",
       transaction_id: paymentIntent.id,
+      products,  
     });
 
     await newTransaction.save();
@@ -156,10 +157,10 @@ exports.createBankTransferIntent = async (req, res) => {
     });
   } catch (error) {
     console.error("Stripe BECS Error:", error);
-    res.status(500).json({ error: "Failed to create bank transfer intent" });
+    res.status(500).json({ error: "Failed to create bank transfer transaction." });
   }
 };
-
+ 
 exports.getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.find({})
