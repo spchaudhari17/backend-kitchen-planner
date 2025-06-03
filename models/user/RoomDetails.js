@@ -27,7 +27,7 @@
 //     },
 //     subdescription: {
 //       type: String,
-      
+
 //     },
 //     notes: { type: Object, default: {} },
 //     droppedItems: { type: [DroppedItemSchema], required: true, default: [] } // Store dropped items
@@ -46,6 +46,17 @@ const DroppedItemSchema = new mongoose.Schema({
   imageSrc: { type: String, required: true },
   height: { type: Number, required: true },
   width: { type: Number, required: true },
+  minWidth: { type: Number },
+  maxWidth: { type: Number },
+  minDepth: { type: Number },
+  maxDepth: { type: Number },
+  hinges: { type: Number },
+  handles: { type: Number },
+  drawers: { type: Number },
+  description: { type: String },
+  overlap: { type: Number },
+  basePrice: { type: String },
+  cabinateType: { type: String, required: true },
 });
 
 const RoomDetailsSchema = new mongoose.Schema(
@@ -58,6 +69,7 @@ const RoomDetailsSchema = new mongoose.Schema(
     notes: { type: Object, default: {} },
     droppedItems: { type: [DroppedItemSchema], required: true, default: [] },
     snapshotImage: { type: String, default: "" } // ✅ Fix goes here
+
   },
   { timestamps: true } // ✅ schema options stay here
 );

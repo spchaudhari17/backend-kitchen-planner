@@ -28,6 +28,7 @@ const cartSchema = new mongoose.Schema({
       handles: { type: Number },
       drawers: { type: Number },
       cabinateType: { type: String },
+      overlap: { type: Number },
     },
   ],
   createdAt: {
